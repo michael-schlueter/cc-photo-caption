@@ -9,3 +9,25 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Image {
+  id       Int       @id @default(autoincrement())
+  name     String?
+  url      String    @unique
+  captions Caption[]
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    Int     @unique
+  name     String  @unique
+  password String
+  isAdmin  Boolean
+}
+
+model Caption {
+  id          Int    @id @default(autoincrement())
+  description String
+  image       Image  @relation(fields: [imageId], references: [id])
+  imageId     Int
+}
