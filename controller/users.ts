@@ -22,3 +22,29 @@ export const getAllUsers = async (req: Request, res: Response) => {
     });
   }
 };
+
+// @desc    Get specific user by id
+// @route   GET /api/users/id
+export const getUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    if (!user) {
+      return res.status(404).send({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).send(user);
+  } catch (err: any) {
+    return res.status(500).send({
+      message: err.message,
+    });
+  }
+};
