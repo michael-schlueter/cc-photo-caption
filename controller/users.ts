@@ -48,3 +48,35 @@ export const getUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+// @desc    Delete specific user
+// @route   DELETE /api/users/id
+export const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const userToDelete = await prisma.user.findUnique({
+        where: {
+            id: parseInt(id),
+        },
+    });
+
+    if (!userToDelete) {
+        return res.status(404).send({
+            message: "User not found",
+        });
+    }
+
+    await prisma.user.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    res.sendStatus(204);
+  } catch (err: any) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+};

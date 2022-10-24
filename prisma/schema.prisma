@@ -29,8 +29,8 @@ model User {
 model Caption {
   id          Int    @id @default(autoincrement())
   description String
-  image       Image  @relation(fields: [imageId], references: [id])
+  image       Image  @relation(fields: [imageId], references: [id], onDelete: Cascade)
   imageId     Int
-  user        User  @relation(fields: [userId], references: [id])
+  user        User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
 }
