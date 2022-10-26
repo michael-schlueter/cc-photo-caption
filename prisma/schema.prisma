@@ -22,7 +22,7 @@ model User {
   email    String  @unique
   name     String  @unique
   password String
-  isAdmin  Boolean
+  isAdmin  Boolean @default(false)
   captions Caption[]
 }
 

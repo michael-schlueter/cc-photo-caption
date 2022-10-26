@@ -7,7 +7,11 @@ const prisma = new PrismaClient();
 // @route   GET /api/images
 export const getAllImages = async (req: Request, res: Response) => {
   try {
-    const images = await prisma.image.findMany();
+    const images = await prisma.image.findMany({
+      include: {
+        captions: true,
+      },
+    });
 
     if (images.length < 1) {
       return res.status(404).send({
@@ -32,6 +36,9 @@ export const getImage = async (req: Request, res: Response) => {
     const image = await prisma.image.findUnique({
       where: {
         id: parseInt(id),
+      },
+      include: {
+        captions: true,
       },
     });
 

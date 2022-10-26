@@ -7,7 +7,11 @@ const prisma = new PrismaClient();
 // @route   GET /api/users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      include: {
+        captions: true,
+      }
+    });
 
     if (users.length < 1) {
       return res.status(404).send({
@@ -32,6 +36,9 @@ export const getUser = async (req: Request, res: Response) => {
     const user = await prisma.user.findUnique({
       where: {
         id: parseInt(id),
+      },
+      include: {
+        captions: true,
       },
     });
 
