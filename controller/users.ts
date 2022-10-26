@@ -49,6 +49,42 @@ export const getUser = async (req: Request, res: Response) => {
   }
 };
 
+// @desc    Create an user
+// @route   POST /api/users/
+export const createUser = async (req: Request, res: Response) => {
+  const { name, email, password } = req.body;
+
+  try {
+    if (
+      name === "" ||
+      name == null ||
+      email === "" ||
+      email == null ||
+      password === "" ||
+      password == null
+    ) {
+      return res.status(400).send({
+        message: "Username, email or password is missing",
+      });
+    }
+
+    const newUser = await prisma.user.create({
+      data: {
+        name: name,
+        email: email,
+        password: password,
+        isAdmin: false,
+      },
+    });
+
+    return res.status(201).send(newUser);
+  } catch (err: any) {
+    return res.status(500).send({
+      message: err.message,
+    });
+  }
+};
+
 // @desc    Delete specific user
 // @route   DELETE /api/users/id
 export const deleteUser = async (req: Request, res: Response) => {
@@ -56,15 +92,15 @@ export const deleteUser = async (req: Request, res: Response) => {
 
   try {
     const userToDelete = await prisma.user.findUnique({
-        where: {
-            id: parseInt(id),
-        },
+      where: {
+        id: parseInt(id),
+      },
     });
 
     if (!userToDelete) {
-        return res.status(404).send({
-            message: "User not found",
-        });
+      return res.status(404).send({
+        message: "User not found",
+      });
     }
 
     await prisma.user.delete({
