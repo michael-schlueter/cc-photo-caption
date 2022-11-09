@@ -1,13 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { addRefreshTokenToWhitelist } from "../services/auth.services";
+import {
+  addRefreshTokenToWhitelist,
+  deleteRefreshToken,
+  findRefreshTokenById,
+  revokeTokens,
+} from "../services/auth.services";
 import {
   createUserByEmailAndPassword,
   findUserByEmail,
+  findUserById,
 } from "../services/users.services";
 import { generateTokens } from "../utils/jwt";
+import { hashToken } from "../utils/hashToken";
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const prisma = new PrismaClient();
 
@@ -63,42 +71,6 @@ export const getUser = async (req: Request, res: Response) => {
     });
   }
 };
-
-// @desc    Create an user
-// @route   POST /api/users/
-// export const createUser = async (req: Request, res: Response) => {
-//   const { name, email, password } = req.body;
-
-//   try {
-//     if (
-//       name === "" ||
-//       name == null ||
-//       email === "" ||
-//       email == null ||
-//       password === "" ||
-//       password == null
-//     ) {
-//       return res.status(400).send({
-//         message: "Username, email or password is missing",
-//       });
-//     }
-
-//     const newUser = await prisma.user.create({
-//       data: {
-//         name: name,
-//         email: email,
-//         password: password,
-//         isAdmin: false,
-//       },
-//     });
-
-//     return res.status(201).send(newUser);
-//   } catch (err: any) {
-//     return res.status(500).send({
-//       message: err.message,
-//     });
-//   }
-// };
 
 // @desc    Create an user
 // @route   POST /api/users/
@@ -244,6 +216,71 @@ export const deleteUser = async (req: Request, res: Response) => {
     });
 
     res.sendStatus(204);
+  } catch (err: any) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+};
+
+// @desc    Validate and delete/renew refresh token
+// @route   POST /api/users/refreshToken
+export const validateRefreshToken = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+  try {
+    if (!refreshToken) {
+      res.status(400).send("Missing refresh token");
+    }
+
+    const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const savedRefreshToken = await findRefreshTokenById(payload.jti);
+
+    if (!savedRefreshToken || savedRefreshToken.revoked === true) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const hashedToken = hashToken(refreshToken);
+    if (hashedToken !== savedRefreshToken?.hashedToken) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const user = await findUserById(payload.userId);
+    if (!user) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    await deleteRefreshToken(savedRefreshToken.id);
+    const jti = uuidv4();
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens(
+      user,
+      jti
+    );
+    await addRefreshTokenToWhitelist({
+      jti,
+      refreshToken: newRefreshToken,
+      userId: user.id,
+    });
+
+    res.json({
+      accessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (err: any) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+};
+
+// This endpoint is only for demo purpose.
+// Move this logic where you need to revoke the tokens (e.g. password reset)
+// @desc    Revoke refresh token for a specific user
+// @route   POST /api/users/id
+export const revokeRefreshTokens = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body;
+    await revokeTokens(userId);
+    res.json({ message: `Tokens revoked for user with id #${userId}` });
   } catch (err: any) {
     res.status(500).send({
       message: err.message,
