@@ -1,14 +1,14 @@
 const jwt = require("jsonwebtoken");
 
 // @ts-ignore
-const generateAccessToken = (user) => {
+export const generateAccessToken = (user) => {
   return jwt.sign({ userId: user.id }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: "5m",
   });
 };
 
 // @ts-ignore
-const generateRefreshToken = (user, jti) => {
+export const generateRefreshToken = (user, jti) => {
   return jwt.sign(
     {
       userId: user.id,
@@ -22,7 +22,7 @@ const generateRefreshToken = (user, jti) => {
 };
 
 // @ts-ignore
-const generateTokens = (user, jti) => {
+export const generateTokens = (user, jti) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user, jti);
 
@@ -32,8 +32,3 @@ const generateTokens = (user, jti) => {
   };
 };
 
-module.exports = {
-    generateAccessToken,
-    generateRefreshToken,
-    generateTokens
-}

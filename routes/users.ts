@@ -4,7 +4,7 @@ import {
   getAllUsers,
   getUser,
   deleteUser,
-  createUser,
+  registerUser,
   updateUser,
 } from "../controller/users";
 
@@ -12,7 +12,7 @@ const userRouter = express.Router();
 
 userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUser);
-userRouter.post("/", createUser);
+userRouter.post("/", registerUser);
 userRouter.put("/:id", updateUser);
 userRouter.delete("/:id", deleteUser);
 

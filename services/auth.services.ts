@@ -1,11 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-const hashToken = require("../utils/hashToken");
+import { hashToken } from "../utils/hashToken";
 
 const prisma = new PrismaClient();
 
 // Used when creating a new token
 // @ts-ignore
-const addRefreshTokenToWhitelist = ({ jti, refreshToken, userId }) => {
+export const addRefreshTokenToWhitelist = ({ jti, refreshToken, userId }) => {
   return prisma.refreshToken.create({
     data: {
       id: jti,
@@ -16,7 +16,7 @@ const addRefreshTokenToWhitelist = ({ jti, refreshToken, userId }) => {
 };
 
 // Used when checking if the token sent by the client is in the database
-const findRefreshTokenById = (id: string) => {
+export const findRefreshTokenById = (id: string) => {
   return prisma.refreshToken.findUnique({
     where: {
       id,
@@ -25,7 +25,7 @@ const findRefreshTokenById = (id: string) => {
 };
 
 // Soft delete token after usage
-const deleteRefreshToken = (id: string) => {
+export const deleteRefreshToken = (id: string) => {
   return prisma.refreshToken.update({
     where: {
       id,
@@ -36,7 +36,7 @@ const deleteRefreshToken = (id: string) => {
   });
 };
 
-const revokeTokens = (userId: number) => {
+export const revokeTokens = (userId: number) => {
   return prisma.refreshToken.updateMany({
     where: {
       userId,
@@ -47,9 +47,4 @@ const revokeTokens = (userId: number) => {
   });
 };
 
-module.exports = {
-    addRefreshTokenToWhitelist,
-    findRefreshTokenById,
-    deleteRefreshToken,
-    revokeTokens,
-}
+

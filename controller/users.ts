@@ -1,5 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { addRefreshTokenToWhitelist } from "../services/auth.services";
+import {
+  createUserByEmailAndPassword,
+  findUserByEmail,
+} from "../services/users.services";
+import { generateTokens } from "../utils/jwt";
+const { v4: uuidv4 } = require('uuid');
 
 const prisma = new PrismaClient();
 
@@ -10,7 +17,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const users = await prisma.user.findMany({
       include: {
         captions: true,
-      }
+      },
     });
 
     if (users.length < 1) {
@@ -58,36 +65,71 @@ export const getUser = async (req: Request, res: Response) => {
 
 // @desc    Create an user
 // @route   POST /api/users/
-export const createUser = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+// export const createUser = async (req: Request, res: Response) => {
+//   const { name, email, password } = req.body;
 
+//   try {
+//     if (
+//       name === "" ||
+//       name == null ||
+//       email === "" ||
+//       email == null ||
+//       password === "" ||
+//       password == null
+//     ) {
+//       return res.status(400).send({
+//         message: "Username, email or password is missing",
+//       });
+//     }
+
+//     const newUser = await prisma.user.create({
+//       data: {
+//         name: name,
+//         email: email,
+//         password: password,
+//         isAdmin: false,
+//       },
+//     });
+
+//     return res.status(201).send(newUser);
+//   } catch (err: any) {
+//     return res.status(500).send({
+//       message: err.message,
+//     });
+//   }
+// };
+
+// @desc    Create an user
+// @route   POST /api/users/
+export const registerUser = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
   try {
-    if (
-      name === "" ||
-      name == null ||
-      email === "" ||
-      email == null ||
-      password === "" ||
-      password == null
-    ) {
-      return res.status(400).send({
-        message: "Username, email or password is missing",
+    if (!email || !password) {
+      res.status(400).send({
+        message: "You must provide an email and a password",
       });
     }
 
-    const newUser = await prisma.user.create({
-      data: {
-        name: name,
-        email: email,
-        password: password,
-        isAdmin: false,
-      },
-    });
+    const existingUser = await findUserByEmail(email);
 
-    return res.status(201).send(newUser);
+    if (existingUser) {
+      res.status(400).send({
+        message: "Email already in use.",
+      });
+    }
+
+    const user = await createUserByEmailAndPassword({ email, password });
+    const jti = uuidv4();
+    const { accessToken, refreshToken } = generateTokens(user, jti);
+    await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id });
+
+    res.json({
+      accessToken,
+      refreshToken,
+    });
   } catch (err: any) {
     return res.status(500).send({
-      message: err.message,
+      error: err.message,
     });
   }
 };
@@ -96,19 +138,17 @@ export const createUser = async (req: Request, res: Response) => {
 // @route   PUT /api/users/id
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, email, password } = req.body;
+  const { email, password } = req.body;
 
   try {
     if (
-      name === "" ||
-      name == null ||
       email === "" ||
       email == null ||
       password === "" ||
       password == null
     ) {
       return res.status(400).send({
-        message: "Username, email or password is missing",
+        message: "Email or password is missing",
       });
     }
 
@@ -117,7 +157,6 @@ export const updateUser = async (req: Request, res: Response) => {
         id: parseInt(id),
       },
       data: {
-        name: name,
         email: email,
         password: password,
         isAdmin: false,
