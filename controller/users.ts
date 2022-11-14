@@ -78,7 +78,7 @@ export const registerUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
     if (!email || !password) {
-      res.status(400).send({
+      return res.status(400).send({
         message: "You must provide an email and a password",
       });
     }
@@ -86,7 +86,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const existingUser = await findUserByEmail(email);
 
     if (existingUser) {
-      res.status(400).send({
+      return res.status(400).send({
         message: "Email already in use.",
       });
     }
@@ -96,7 +96,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const { accessToken, refreshToken } = generateTokens(user, jti);
     await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id });
 
-    res.json({
+    return res.json({
       accessToken,
       refreshToken,
     });
@@ -113,7 +113,7 @@ export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
     if (!email || !password) {
-      res.status(400).send({
+      return res.status(400).send({
         message: "You must provide an email and a password",
       });
     }
@@ -121,7 +121,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const existingUser = await findUserByEmail(email);
 
     if (!existingUser) {
-      res.status(403).send("Invalid login credentials");
+      return res.status(403).send("Invalid login credentials");
     }
 
     const validPassword = await bcrypt.compare(
@@ -129,13 +129,12 @@ export const loginUser = async (req: Request, res: Response) => {
       existingUser?.password
     );
     if (!validPassword) {
-      res.status(403).send({
+      return res.status(403).send({
         message: "Invalid login credentials",
       });
     }
 
     const jti = uuidv4();
-    // @ts-ignore
     const { accessToken, refreshToken } = generateTokens(existingUser, jti);
     await addRefreshTokenToWhitelist({
       jti,
@@ -143,7 +142,7 @@ export const loginUser = async (req: Request, res: Response) => {
       userId: existingUser?.id,
     });
 
-    res.json({
+    return res.json({
       accessToken,
       refreshToken,
     });
@@ -216,9 +215,9 @@ export const deleteUser = async (req: Request, res: Response) => {
       },
     });
 
-    res.sendStatus(204);
+    return res.sendStatus(204);
   } catch (err: any) {
-    res.status(500).send({
+    return res.status(500).send({
       message: err.message,
     });
   }
@@ -230,7 +229,7 @@ export const validateRefreshToken = async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
   try {
     if (!refreshToken) {
-      res.status(400).send("Missing refresh token");
+      return res.status(400).send("Missing refresh token");
     }
 
     const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
@@ -262,12 +261,12 @@ export const validateRefreshToken = async (req: Request, res: Response) => {
       userId: user.id,
     });
 
-    res.json({
+    return res.json({
       accessToken,
       refreshToken: newRefreshToken,
     });
   } catch (err: any) {
-    res.status(500).send({
+    return res.status(500).send({
       message: err.message,
     });
   }
