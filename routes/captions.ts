@@ -14,7 +14,7 @@ const captionRouter = express.Router();
 captionRouter.get("/", getAllCaptions);
 captionRouter.get("/:id", getCaption);
 captionRouter.post("/", isAuthenticated, createCaption);
-captionRouter.put("/:id", updateCaption);
+captionRouter.put("/:id", isAuthenticated, updateCaption);
 captionRouter.delete("/:id", deleteCaption);
 
 module.exports = captionRouter;

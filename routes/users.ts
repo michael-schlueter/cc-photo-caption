@@ -1,4 +1,5 @@
 import express from "express";
+import { isAuthenticated } from "../middleware";
 
 import {
   getAllUsers,
@@ -19,7 +20,7 @@ userRouter.post("/", registerUser);
 userRouter.post("/login", loginUser);
 userRouter.post("/refreshToken", validateRefreshToken);
 userRouter.post(":id", revokeRefreshTokens);
-userRouter.put("/:id", updateUser);
-userRouter.delete("/:id", deleteUser);
+userRouter.put("/:id", isAuthenticated, updateUser);
+userRouter.delete("/:id", isAuthenticated, deleteUser);
 
 module.exports = userRouter;

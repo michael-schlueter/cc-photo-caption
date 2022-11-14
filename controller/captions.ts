@@ -81,10 +81,10 @@ export const createCaption = async (req: Request, res: Response) => {
 // @route   PUT /api/captions/id
 export const updateCaption = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { description, imageId, userId } = req.body;
+  const { description } = req.body;
 
   try {
-    if (description === "" || description == null || imageId === "" || imageId == null || userId === "" || userId == null) {
+    if (description === "" || description == null) {
       return res.status(400).send({
         message: "Description, image ID or user ID missing",
       });
@@ -96,8 +96,6 @@ export const updateCaption = async (req: Request, res: Response) => {
       },
       data: {
         description,
-        imageId: parseInt(imageId),
-        userId: parseInt(userId),
       },
     });
 
