@@ -1,7 +1,6 @@
 const crypto = require("crypto");
 
-// @ts-ignore
-export const hashToken = (token) => {
+export const hashToken = (token: string) => {
   return crypto.createHash("sha512").update(token).digest("hex");
 };
 

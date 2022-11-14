@@ -135,6 +135,7 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 
     const jti = uuidv4();
+    // @ts-ignore
     const { accessToken, refreshToken } = generateTokens(existingUser, jti);
     await addRefreshTokenToWhitelist({
       jti,
