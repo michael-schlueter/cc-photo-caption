@@ -166,13 +166,19 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.payload?.userId
+      }
+    })
+
     const userToUpdate = await prisma.user.findUnique({
       where: {
         id: parseInt(id),
       },
     });
 
-    if (req.payload?.userId !== userToUpdate?.id ) {
+    if (req.payload?.userId !== userToUpdate?.id && user?.isAdmin === false) {
       return res.status(403).send({
         message: "Not authorized to update user information"
       })
@@ -221,7 +227,13 @@ export const deleteUser = async (req: Request, res: Response) => {
       });
     }
 
-    if (req.payload?.userId !== userToDelete.id) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.payload?.userId
+      }
+    })
+
+    if (req.payload?.userId !== userToDelete.id && user?.isAdmin === false) {
       return res.status(403).send({
         message: "Not authorized to delete user"
       })
