@@ -15,6 +15,6 @@ captionRouter.get("/", getAllCaptions);
 captionRouter.get("/:id", getCaption);
 captionRouter.post("/", isAuthenticated, createCaption);
 captionRouter.put("/:id", isAuthenticated, updateCaption);
-captionRouter.delete("/:id", deleteCaption);
+captionRouter.delete("/:id", isAuthenticated, deleteCaption);
 
 module.exports = captionRouter;

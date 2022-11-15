@@ -55,7 +55,14 @@ export const createCaption = async (req: Request, res: Response) => {
   const { description, imageId, userId } = req.body;
 
   try {
-    if (description === "" || description == null || imageId === "" || imageId == null || userId === "" || userId == null) {
+    if (
+      description === "" ||
+      description == null ||
+      imageId === "" ||
+      imageId == null ||
+      userId === "" ||
+      userId == null
+    ) {
       return res.status(400).send({
         message: "Description, image ID or user ID missing",
       });
@@ -84,9 +91,22 @@ export const updateCaption = async (req: Request, res: Response) => {
   const { description } = req.body;
 
   try {
+
+    const captionToUpdate = await prisma.caption.findUnique({
+      where: {
+        id: parseInt(id),
+      }
+    });
+
+    if (req.payload?.userId !== captionToUpdate?.userId) {
+      return res.status(403).send({
+        message: "Unauthorized to update this caption",
+      });
+    }
+
     if (description === "" || description == null) {
       return res.status(400).send({
-        message: "Description, image ID or user ID missing",
+        message: "Description is missing",
       });
     }
 
@@ -128,6 +148,14 @@ export const deleteCaption = async (req: Request, res: Response) => {
     if (!captionToDelete) {
       return res.status(404).send({
         message: "Caption not found",
+      });
+    }
+
+    if (req.payload?.userId !== captionToDelete?.userId) {
+      console.log(req.payload?.userId);
+      console.log(captionToDelete.userId);
+      return res.status(403).send({
+        message: "Unauthorized to delete this caption",
       });
     }
 
