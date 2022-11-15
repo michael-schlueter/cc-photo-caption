@@ -190,7 +190,7 @@ export const updateUser = async (req: Request, res: Response) => {
       },
       data: {
         email: email,
-        password: password,
+        password: bcrypt.hashSync(password, 12),
         isAdmin: false,
       },
     });

@@ -105,8 +105,6 @@ export const updateCaption = async (req: Request, res: Response) => {
     })
 
     if (req.payload?.userId !== captionToUpdate?.userId && user?.isAdmin === false) {
-      console.log(user.isAdmin);
-      console.log(user.id)
       return res.status(403).send({
         message: "Unauthorized to update this caption",
       });
@@ -129,7 +127,7 @@ export const updateCaption = async (req: Request, res: Response) => {
 
     if (!updatedCaption) {
       return res.status(404).send({
-        message: "caption not found",
+        message: "Caption not found",
       });
     }
 
