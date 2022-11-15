@@ -98,7 +98,15 @@ export const updateCaption = async (req: Request, res: Response) => {
       }
     });
 
-    if (req.payload?.userId !== captionToUpdate?.userId) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.payload?.userId
+      }
+    })
+
+    if (req.payload?.userId !== captionToUpdate?.userId && user?.isAdmin === false) {
+      console.log(user.isAdmin);
+      console.log(user.id)
       return res.status(403).send({
         message: "Unauthorized to update this caption",
       });
@@ -145,13 +153,19 @@ export const deleteCaption = async (req: Request, res: Response) => {
       },
     });
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.payload?.userId
+      }
+    })
+
     if (!captionToDelete) {
       return res.status(404).send({
         message: "Caption not found",
       });
     }
 
-    if (req.payload?.userId !== captionToDelete?.userId) {
+    if (req.payload?.userId !== captionToDelete?.userId && user?.isAdmin === false) {
       return res.status(403).send({
         message: "Unauthorized to delete this caption",
       });

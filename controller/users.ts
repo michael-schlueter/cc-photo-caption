@@ -172,7 +172,7 @@ export const updateUser = async (req: Request, res: Response) => {
       },
     });
 
-    if (req.payload?.userId !== userToUpdate?.id) {
+    if (req.payload?.userId !== userToUpdate?.id ) {
       return res.status(403).send({
         message: "Not authorized to update user information"
       })
