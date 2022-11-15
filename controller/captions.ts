@@ -152,8 +152,6 @@ export const deleteCaption = async (req: Request, res: Response) => {
     }
 
     if (req.payload?.userId !== captionToDelete?.userId) {
-      console.log(req.payload?.userId);
-      console.log(captionToDelete.userId);
       return res.status(403).send({
         message: "Unauthorized to delete this caption",
       });

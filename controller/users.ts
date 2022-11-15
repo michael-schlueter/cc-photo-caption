@@ -166,6 +166,18 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
+    const userToUpdate = await prisma.user.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    if (req.payload?.userId !== userToUpdate?.id) {
+      return res.status(403).send({
+        message: "Not authorized to update user information"
+      })
+    }
+
     const updatedUser = await prisma.user.update({
       where: {
         id: parseInt(id),
@@ -207,6 +219,12 @@ export const deleteUser = async (req: Request, res: Response) => {
       return res.status(404).send({
         message: "User not found",
       });
+    }
+
+    if (req.payload?.userId !== userToDelete.id) {
+      return res.status(403).send({
+        message: "Not authorized to delete user"
+      })
     }
 
     await prisma.user.delete({
