@@ -7,13 +7,14 @@ import {
   createImage,
   updateImage,
 } from "../controller/images";
+import { isAuthenticated } from "../middleware";
 
 const imageRouter = express.Router();
 
 imageRouter.get("/", getAllImages);
 imageRouter.get("/:id", getImage);
-imageRouter.post("/", createImage);
-imageRouter.put("/:id", updateImage);
-imageRouter.delete("/:id", deleteImage);
+imageRouter.post("/", isAuthenticated, createImage);
+imageRouter.put("/:id", isAuthenticated, updateImage);
+imageRouter.delete("/:id", isAuthenticated, deleteImage);
 
 module.exports = imageRouter;
