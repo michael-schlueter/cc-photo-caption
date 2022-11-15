@@ -63,18 +63,6 @@ export const createImage = async (req: Request, res: Response) => {
 
   try {
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.payload?.userId
-      }
-    })
-
-    if (user?.isAdmin === false) {
-      return res.status(403).send({
-        message: "Not authorized to upload images"
-      })
-    }
-
     if (url === "" || url == null) {
       return res.status(400).send({
         message: "Image Path is missing",
@@ -103,18 +91,6 @@ export const updateImage = async (req: Request, res: Response) => {
   const { name, url } = req.body;
 
   try {
-
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.payload?.userId
-      }
-    })
-
-    if (user?.isAdmin === false) {
-      return res.status(403).send({
-        message: "Not authorized to update images"
-      })
-    }
 
     if (url === "" || url == null) {
       return res.status(400).send({
@@ -152,18 +128,6 @@ export const deleteImage = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.payload?.userId
-      }
-    })
-
-    if (user?.isAdmin === false) {
-      return res.status(403).send({
-        message: "Not authorized to delete images"
-      })
-    }
 
     const imageToDelete = await prisma.image.findUnique({
       where: {
