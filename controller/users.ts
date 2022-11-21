@@ -11,6 +11,7 @@ import {
   findUserByEmail,
   findUserById,
   validateEmail,
+  validatePassword,
 } from "../services/users.services";
 import { generateTokens } from "../utils/jwt";
 import { hashToken } from "../utils/hashToken";
@@ -99,6 +100,13 @@ export const registerUser = async (req: Request, res: Response) => {
       })
     }
 
+    const validPassword = validatePassword(password);
+    if (!validPassword) {
+      return res.status(400).send({
+        message: "Password has to have at minimum 8 characters with one lowercase letter, one uppercase letter, one number and one special character"
+      })
+    }
+
     const user = await createUserByEmailAndPassword({ email, password });
     const jti = uuidv4();
     const { accessToken, refreshToken } = generateTokens(user, jti);
@@ -178,6 +186,13 @@ export const updateUser = async (req: Request, res: Response) => {
     if (!validEmail) {
       return res.status(400).send({
         message: "Please enter a valid email address"
+      })
+    }
+
+    const validPassword = validatePassword(password);
+    if (!validPassword) {
+      return res.status(400).send({
+        message: "Password has to have at minimum 8 characters with one lowercase letter, one uppercase letter, one number and one special character"
       })
     }
 
