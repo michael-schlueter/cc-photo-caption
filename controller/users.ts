@@ -10,6 +10,7 @@ import {
   createUserByEmailAndPassword,
   findUserByEmail,
   findUserById,
+  validateEmail,
 } from "../services/users.services";
 import { generateTokens } from "../utils/jwt";
 import { hashToken } from "../utils/hashToken";
@@ -91,6 +92,13 @@ export const registerUser = async (req: Request, res: Response) => {
       });
     }
 
+    const validEmail = validateEmail(email);
+    if (!validEmail) {
+      return res.status(400).send({
+        message: "Please enter a valid email address"
+      })
+    }
+
     const user = await createUserByEmailAndPassword({ email, password });
     const jti = uuidv4();
     const { accessToken, refreshToken } = generateTokens(user, jti);
@@ -164,6 +172,13 @@ export const updateUser = async (req: Request, res: Response) => {
       return res.status(400).send({
         message: "Email or password is missing",
       });
+    }
+
+    const validEmail = validateEmail(email);
+    if (!validEmail) {
+      return res.status(400).send({
+        message: "Please enter a valid email address"
+      })
     }
 
     const user = await findUserById(req.payload!.userId);
