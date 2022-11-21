@@ -78,8 +78,13 @@ export const createImage = async (req: Request, res: Response) => {
 
     return res.status(201).send(newImage);
   } catch (err: any) {
+    if (err.meta.target.includes("url")) {
+      return res.status(400).send({
+        message: "URL already in use"
+      })
+    }
     return res.status(500).send({
-      message: err.message,
+      message: err,
     });
   }
 };
@@ -116,8 +121,13 @@ export const updateImage = async (req: Request, res: Response) => {
 
     return res.status(200).send(updatedImage);
   } catch (err: any) {
+    if (err.meta.target.includes("url")) {
+      return res.status(400).send({
+        message: "URL already in use"
+      })
+    }
     return res.status(500).send({
-      message: err.message,
+      message: err,
     });
   }
 };
