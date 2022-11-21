@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { findCaptionById } from "../services/captions.services";
+import { findUserById } from "../services/users.services";
 
 const prisma = new PrismaClient();
 
@@ -29,11 +31,7 @@ export const getCaption = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const caption = await prisma.caption.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-    });
+    const caption = await findCaptionById(parseInt(id));
 
     if (!caption) {
       return res.status(404).send({
@@ -92,17 +90,8 @@ export const updateCaption = async (req: Request, res: Response) => {
 
   try {
 
-    const captionToUpdate = await prisma.caption.findUnique({
-      where: {
-        id: parseInt(id),
-      }
-    });
-
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.payload?.userId
-      }
-    })
+    const captionToUpdate = await findCaptionById(parseInt(id));
+    const user = await findUserById(req.payload!.userId);
 
     if (req.payload?.userId !== captionToUpdate?.userId && user?.isAdmin === false) {
       return res.status(403).send({
@@ -145,17 +134,8 @@ export const deleteCaption = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const captionToDelete = await prisma.caption.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-    });
-
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.payload?.userId
-      }
-    })
+    const captionToDelete = await findCaptionById(parseInt(id));
+    const user = await findUserById(req.payload!.userId);
 
     if (!captionToDelete) {
       return res.status(404).send({

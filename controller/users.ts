@@ -166,17 +166,8 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.payload?.userId
-      }
-    })
-
-    const userToUpdate = await prisma.user.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-    });
+    const user = await findUserById(req.payload!.userId);
+    const userToUpdate = await findUserById(parseInt(id));
 
     if (req.payload?.userId !== userToUpdate?.id && user?.isAdmin === false) {
       return res.status(403).send({
@@ -215,11 +206,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const userToDelete = await prisma.user.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-    });
+    const userToDelete = await findUserById(parseInt(id));
 
     if (!userToDelete) {
       return res.status(404).send({
@@ -227,11 +214,8 @@ export const deleteUser = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.payload?.userId
-      }
-    })
+    // User who deletes
+    const user = await findUserById(req.payload!.userId);
 
     if (req.payload?.userId !== userToDelete.id && user?.isAdmin === false) {
       return res.status(403).send({
