@@ -112,10 +112,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const { accessToken, refreshToken } = generateTokens(user, jti);
     await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id });
 
-    return res.json({
-      accessToken,
-      refreshToken,
-    });
+    return res.status(201).send({accessToken, refreshToken});
   } catch (err: any) {
     return res.status(500).send({
       error: err.message,
@@ -137,7 +134,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const existingUser = await findUserByEmail(email);
 
     if (!existingUser) {
-      return res.status(403).send("Invalid login credentials");
+      return res.status(401).send("Invalid login credentials");
     }
 
     const validPassword = await bcrypt.compare(
@@ -145,7 +142,7 @@ export const loginUser = async (req: Request, res: Response) => {
       existingUser?.password
     );
     if (!validPassword) {
-      return res.status(403).send({
+      return res.status(401).send({
         message: "Invalid login credentials",
       });
     }
@@ -158,7 +155,7 @@ export const loginUser = async (req: Request, res: Response) => {
       userId: existingUser?.id,
     });
 
-    return res.json({
+    return res.status(201).send({
       accessToken,
       refreshToken,
     });
@@ -310,7 +307,7 @@ export const validateRefreshToken = async (req: Request, res: Response) => {
       userId: user.id,
     });
 
-    return res.json({
+    return res.status(201).send({
       accessToken,
       refreshToken: newRefreshToken,
     });
@@ -329,7 +326,7 @@ export const revokeRefreshTokens = async (req: Request, res: Response) => {
   try {
     const { userId } = req.body;
     await revokeTokens(userId);
-    res.json({ message: `Tokens revoked for user with id #${userId}` });
+    res.status(201).send({ message: `Tokens revoked for user with id #${userId}` });
   } catch (err: any) {
     res.status(500).send({
       message: err.message,
