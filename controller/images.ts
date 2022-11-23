@@ -1,5 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import {
+  createImage,
+  editImage,
+  findImageByIdWithCaptions,
+  findImages,
+  removeImage,
+} from "../services/images.services";
 
 const prisma = new PrismaClient();
 
@@ -7,11 +14,7 @@ const prisma = new PrismaClient();
 // @route   GET /api/images
 export const getAllImages = async (req: Request, res: Response) => {
   try {
-    const images = await prisma.image.findMany({
-      include: {
-        captions: true,
-      },
-    });
+    const images = await findImages();
 
     if (images.length < 1) {
       return res.status(404).send({
@@ -33,14 +36,7 @@ export const getImage = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const image = await prisma.image.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-      include: {
-        captions: true,
-      },
-    });
+    const image = await findImageByIdWithCaptions(parseInt(id));
 
     if (!image) {
       return res.status(404).send({
@@ -58,30 +54,24 @@ export const getImage = async (req: Request, res: Response) => {
 
 // @desc    Create an Image
 // @route   POST /api/images/
-export const createImage = async (req: Request, res: Response) => {
+export const addImage = async (req: Request, res: Response) => {
   const { name, url } = req.body;
 
   try {
-
     if (url === "" || url == null) {
       return res.status(400).send({
         message: "Image Path is missing",
       });
     }
 
-    const newImage = await prisma.image.create({
-      data: {
-        name: name,
-        url: url,
-      },
-    });
+    const newImage = await createImage(name, url);
 
     return res.status(201).send(newImage);
   } catch (err: any) {
     if (err.meta.target.includes("url")) {
       return res.status(400).send({
-        message: "URL already in use"
-      })
+        message: "URL already in use",
+      });
     }
     return res.status(500).send({
       message: err,
@@ -96,22 +86,13 @@ export const updateImage = async (req: Request, res: Response) => {
   const { name, url } = req.body;
 
   try {
-
     if (url === "" || url == null) {
       return res.status(400).send({
         message: "Image path is missing",
       });
     }
 
-    const updatedImage = await prisma.image.update({
-      where: {
-        id: parseInt(id),
-      },
-      data: {
-        name: name,
-        url: url,
-      },
-    });
+    const updatedImage = await editImage(parseInt(id), name, url);
 
     if (!updatedImage) {
       return res.status(404).send({
@@ -123,8 +104,8 @@ export const updateImage = async (req: Request, res: Response) => {
   } catch (err: any) {
     if (err.meta.target.includes("url")) {
       return res.status(400).send({
-        message: "URL already in use"
-      })
+        message: "URL already in use",
+      });
     }
     return res.status(500).send({
       message: err,
@@ -138,28 +119,17 @@ export const deleteImage = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-
-    const imageToDelete = await prisma.image.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-    });
-
-    if (!imageToDelete) {
-      return res.status(404).send({
-        message: "Image not found",
-      });
-    }
-
-    await prisma.image.delete({
-      where: {
-        id: parseInt(id),
-      },
-    });
+    const deletedImage = await removeImage(parseInt(id));
 
     res.sendStatus(204);
   } catch (err: any) {
-    res.status(500).send({
+    if (err.code === "P2025") {
+      return res.status(404).send({
+        message: "Image to delete does not exist"
+      });
+    }
+    return res.status(500).send({
+      error: err,
       message: err.message,
     });
   }
