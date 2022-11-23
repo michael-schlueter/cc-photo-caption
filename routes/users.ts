@@ -18,8 +18,8 @@ userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUser);
 userRouter.post("/", registerUser);
 userRouter.post("/login", loginUser);
-userRouter.post("/refreshToken", validateRefreshToken);
-userRouter.post(":id", revokeRefreshTokens);
+userRouter.post("/refreshToken", isAuthenticated, validateRefreshToken);
+userRouter.post(":id", isAuthenticated, revokeRefreshTokens);
 userRouter.put("/:id", isAuthenticated, updateUser);
 userRouter.delete("/:id", isAuthenticated, deleteUser);
 

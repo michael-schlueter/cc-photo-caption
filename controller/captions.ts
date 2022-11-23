@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { findCaptionById } from "../services/captions.services";
+import { createCaption, editCaption, findCaptionById, removeCaption } from "../services/captions.services";
 import { findUserById } from "../services/users.services";
 
 const prisma = new PrismaClient();
@@ -49,8 +49,9 @@ export const getCaption = async (req: Request, res: Response) => {
 
 // @desc    Create an caption
 // @route   POST /api/captions/
-export const createCaption = async (req: Request, res: Response) => {
-  const { description, imageId, userId } = req.body;
+export const addCaption = async (req: Request, res: Response) => {
+  const { description, imageId } = req.body;
+  const userId = req.payload?.userId;
 
   try {
     if (
@@ -58,24 +59,22 @@ export const createCaption = async (req: Request, res: Response) => {
       description == null ||
       imageId === "" ||
       imageId == null ||
-      userId === "" ||
-      userId == null
+      !userId
     ) {
       return res.status(400).send({
         message: "Description, image ID or user ID missing",
       });
     }
 
-    const newCaption = await prisma.caption.create({
-      data: {
-        description,
-        imageId: parseInt(imageId),
-        userId: parseInt(userId),
-      },
-    });
+    const newCaption = await createCaption(description, parseInt(imageId), userId)
 
     return res.status(201).send(newCaption);
   } catch (err: any) {
+    if (err.code === "P2003") {
+      return res.status(400).send({
+        message: "Image id does not exist"
+      })
+    }
     return res.status(500).send({
       message: err.message,
     });
@@ -105,14 +104,7 @@ export const updateCaption = async (req: Request, res: Response) => {
       });
     }
 
-    const updatedCaption = await prisma.caption.update({
-      where: {
-        id: parseInt(id),
-      },
-      data: {
-        description,
-      },
-    });
+    const updatedCaption = await editCaption(parseInt(id), description);
 
     if (!updatedCaption) {
       return res.status(404).send({
@@ -149,11 +141,7 @@ export const deleteCaption = async (req: Request, res: Response) => {
       });
     }
 
-    await prisma.caption.delete({
-      where: {
-        id: parseInt(id),
-      },
-    });
+    removeCaption(parseInt(id));
 
     res.sendStatus(204);
   } catch (err: any) {

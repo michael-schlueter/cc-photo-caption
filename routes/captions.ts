@@ -5,7 +5,7 @@ import {
   getAllCaptions,
   getCaption,
   deleteCaption,
-  createCaption,
+  addCaption,
   updateCaption,
 } from "../controller/captions";
 
@@ -13,7 +13,7 @@ const captionRouter = express.Router();
 
 captionRouter.get("/", getAllCaptions);
 captionRouter.get("/:id", getCaption);
-captionRouter.post("/", isAuthenticated, createCaption);
+captionRouter.post("/", isAuthenticated, addCaption);
 captionRouter.put("/:id", isAuthenticated, updateCaption);
 captionRouter.delete("/:id", isAuthenticated, deleteCaption);
 
