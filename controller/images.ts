@@ -1,14 +1,12 @@
-import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import {
   createImage,
   editImage,
   findImageByIdWithCaptions,
+  findImageByUrl,
   findImages,
   removeImage,
 } from "../services/images.services";
-
-const prisma = new PrismaClient();
 
 // @desc    Get all images
 // @route   GET /api/images
@@ -64,15 +62,18 @@ export const addImage = async (req: Request, res: Response) => {
       });
     }
 
+    const existingImage = await findImageByUrl(url);
+
+    if (existingImage) {
+      return res.status(400).send({
+        message: "Image URL already exists",
+      });
+    }
+
     const newImage = await createImage(name, url);
 
     return res.status(201).send(newImage);
   } catch (err: any) {
-    if (err.meta.target.includes("url")) {
-      return res.status(400).send({
-        message: "URL already in use",
-      });
-    }
     return res.status(500).send({
       message: err,
     });
@@ -125,11 +126,10 @@ export const deleteImage = async (req: Request, res: Response) => {
   } catch (err: any) {
     if (err.code === "P2025") {
       return res.status(404).send({
-        message: "Image to delete does not exist"
+        message: "Image to delete does not exist",
       });
     }
     return res.status(500).send({
-      error: err,
       message: err.message,
     });
   }

@@ -1,6 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { createCaption, editCaption, findCaptionById, removeCaption } from "../services/captions.services";
+import {
+  createCaption,
+  editCaption,
+  findCaptionById,
+  findCaptions,
+  removeCaption,
+} from "../services/captions.services";
 import { findUserById } from "../services/users.services";
 
 const prisma = new PrismaClient();
@@ -9,7 +15,7 @@ const prisma = new PrismaClient();
 // @route   GET /api/captions
 export const getAllCaptions = async (req: Request, res: Response) => {
   try {
-    const captions = await prisma.caption.findMany();
+    const captions = await findCaptions();
 
     if (captions.length < 1) {
       return res.status(404).send({
@@ -66,14 +72,18 @@ export const addCaption = async (req: Request, res: Response) => {
       });
     }
 
-    const newCaption = await createCaption(description, parseInt(imageId), userId)
+    const newCaption = await createCaption(
+      description,
+      parseInt(imageId),
+      userId
+    );
 
     return res.status(201).send(newCaption);
   } catch (err: any) {
     if (err.code === "P2003") {
       return res.status(400).send({
-        message: "Image id does not exist"
-      })
+        message: "Image id does not exist",
+      });
     }
     return res.status(500).send({
       message: err.message,
@@ -88,11 +98,13 @@ export const updateCaption = async (req: Request, res: Response) => {
   const { description } = req.body;
 
   try {
-
     const captionToUpdate = await findCaptionById(parseInt(id));
     const user = await findUserById(req.payload!.userId);
 
-    if (req.payload?.userId !== captionToUpdate?.userId && user?.isAdmin === false) {
+    if (
+      req.payload?.userId !== captionToUpdate?.userId &&
+      user?.isAdmin === false
+    ) {
       return res.status(403).send({
         message: "Unauthorized to update this caption",
       });
@@ -135,7 +147,10 @@ export const deleteCaption = async (req: Request, res: Response) => {
       });
     }
 
-    if (req.payload?.userId !== captionToDelete?.userId && user?.isAdmin === false) {
+    if (
+      req.payload?.userId !== captionToDelete?.userId &&
+      user?.isAdmin === false
+    ) {
       return res.status(403).send({
         message: "Unauthorized to delete this caption",
       });

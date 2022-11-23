@@ -46,5 +46,3 @@ export const revokeTokens = (userId: number) => {
     },
   });
 };
-
-

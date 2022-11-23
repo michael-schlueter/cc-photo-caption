@@ -8,13 +8,17 @@ import {
 } from "../services/auth.services";
 import {
   createUserByEmailAndPassword,
+  editUser,
   findUserByEmail,
   findUserById,
+  findUsers,
+  removeUser,
   validateEmail,
   validatePassword,
 } from "../services/users.services";
 import { generateTokens } from "../utils/jwt";
 import { hashToken } from "../utils/hashToken";
+import { findImageByIdWithCaptions } from "../services/images.services";
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -25,11 +29,7 @@ const prisma = new PrismaClient();
 // @route   GET /api/users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const users = await prisma.user.findMany({
-      include: {
-        captions: true,
-      },
-    });
+    const users = await findUsers();
 
     if (users.length < 1) {
       return res.status(404).send({
@@ -40,7 +40,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     return res.status(200).send(users);
   } catch (err: any) {
     return res.status(500).send({
-      error: err.message,
+      message: err.message,
     });
   }
 };
@@ -51,14 +51,7 @@ export const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: parseInt(id),
-      },
-      include: {
-        captions: true,
-      },
-    });
+    const user = await findImageByIdWithCaptions(parseInt(id));
 
     if (!user) {
       return res.status(404).send({
@@ -96,15 +89,16 @@ export const registerUser = async (req: Request, res: Response) => {
     const validEmail = validateEmail(email);
     if (!validEmail) {
       return res.status(400).send({
-        message: "Please enter a valid email address"
-      })
+        message: "Please enter a valid email address",
+      });
     }
 
     const validPassword = validatePassword(password);
     if (!validPassword) {
       return res.status(400).send({
-        message: "Password has to have at minimum 8 characters with one lowercase letter, one uppercase letter, one number and one special character"
-      })
+        message:
+          "Password has to have at minimum 8 characters with one lowercase letter, one uppercase letter, one number and one special character",
+      });
     }
 
     const user = await createUserByEmailAndPassword({ email, password });
@@ -112,10 +106,10 @@ export const registerUser = async (req: Request, res: Response) => {
     const { accessToken, refreshToken } = generateTokens(user, jti);
     await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id });
 
-    return res.status(201).send({accessToken, refreshToken});
+    return res.status(201).send({ accessToken, refreshToken });
   } catch (err: any) {
     return res.status(500).send({
-      error: err.message,
+      message: err.message,
     });
   }
 };
@@ -182,15 +176,16 @@ export const updateUser = async (req: Request, res: Response) => {
     const validEmail = validateEmail(email);
     if (!validEmail) {
       return res.status(400).send({
-        message: "Please enter a valid email address"
-      })
+        message: "Please enter a valid email address",
+      });
     }
 
     const validPassword = validatePassword(password);
     if (!validPassword) {
       return res.status(400).send({
-        message: "Password has to have at minimum 8 characters with one lowercase letter, one uppercase letter, one number and one special character"
-      })
+        message:
+          "Password has to have at minimum 8 characters with one lowercase letter, one uppercase letter, one number and one special character",
+      });
     }
 
     const user = await findUserById(req.payload!.userId);
@@ -198,20 +193,11 @@ export const updateUser = async (req: Request, res: Response) => {
 
     if (req.payload?.userId !== userToUpdate?.id && user?.isAdmin === false) {
       return res.status(403).send({
-        message: "Not authorized to update user information"
-      })
+        message: "Not authorized to update user information",
+      });
     }
 
-    const updatedUser = await prisma.user.update({
-      where: {
-        id: parseInt(id),
-      },
-      data: {
-        email: email,
-        password: bcrypt.hashSync(password, 12),
-        isAdmin: false,
-      },
-    });
+    const updatedUser = await editUser(parseInt(id), email, password);
 
     if (!updatedUser) {
       return res.status(404).send({
@@ -221,10 +207,10 @@ export const updateUser = async (req: Request, res: Response) => {
 
     return res.status(200).send(updatedUser);
   } catch (err: any) {
-    if (err.meta.target.includes('email')) {
+    if (err.meta.target.includes("email")) {
       return res.status(400).send({
-        message: "Email already in use"
-      })
+        message: "Email already in use",
+      });
     }
     return res.status(500).send({
       message: err.message,
@@ -251,15 +237,11 @@ export const deleteUser = async (req: Request, res: Response) => {
 
     if (req.payload?.userId !== userToDelete.id && user?.isAdmin === false) {
       return res.status(403).send({
-        message: "Not authorized to delete user"
-      })
+        message: "Not authorized to delete user",
+      });
     }
 
-    await prisma.user.delete({
-      where: {
-        id: parseInt(id),
-      },
-    });
+    await removeUser(parseInt(id));
 
     return res.sendStatus(204);
   } catch (err: any) {
@@ -326,7 +308,9 @@ export const revokeRefreshTokens = async (req: Request, res: Response) => {
   try {
     const { userId } = req.body;
     await revokeTokens(userId);
-    res.status(201).send({ message: `Tokens revoked for user with id #${userId}` });
+    res
+      .status(201)
+      .send({ message: `Tokens revoked for user with id #${userId}` });
   } catch (err: any) {
     res.status(500).send({
       message: err.message,
