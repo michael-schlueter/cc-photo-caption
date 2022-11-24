@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { removeFromCache } from "../services/cache.services";
 import {
   createCaption,
   editCaption,
@@ -78,6 +79,8 @@ export const addCaption = async (req: Request, res: Response) => {
       userId
     );
 
+    removeFromCache("images");
+
     return res.status(201).send(newCaption);
   } catch (err: any) {
     if (err.code === "P2003") {
@@ -124,6 +127,8 @@ export const updateCaption = async (req: Request, res: Response) => {
       });
     }
 
+    removeFromCache("images");
+
     return res.status(200).send(updatedCaption);
   } catch (err: any) {
     return res.status(500).send({
@@ -157,6 +162,7 @@ export const deleteCaption = async (req: Request, res: Response) => {
     }
 
     removeCaption(parseInt(id));
+    removeFromCache("images");
 
     res.sendStatus(204);
   } catch (err: any) {

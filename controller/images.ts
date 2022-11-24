@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { addToCache, removeFromCache, retrieveFromCache } from "../services/cache.services";
+import {
+  addToCache,
+  removeFromCache,
+  retrieveFromCache,
+} from "../services/cache.services";
 import {
   createImage,
   editImage,
@@ -9,24 +13,23 @@ import {
   removeImage,
 } from "../services/images.services";
 
-
 // @desc    Get all images
 // @route   GET /api/images
 export const getAllImages = async (req: Request, res: Response) => {
   try {
-    let images = retrieveFromCache('images');
+    let images = retrieveFromCache("images");
 
     if (!images) {
       images = await findImages();
-      addToCache('images', images);
+      addToCache("images", images);
     }
-    
+
     if (images.length < 1) {
       return res.status(404).send({
         message: "No images found",
       });
     }
-    
+
     return res.status(200).send(images);
   } catch (err: any) {
     return res.status(500).send({
@@ -78,7 +81,7 @@ export const addImage = async (req: Request, res: Response) => {
     }
 
     const newImage = await createImage(name, url);
-    removeFromCache('images');
+    removeFromCache("images");
 
     return res.status(201).send(newImage);
   } catch (err: any) {
@@ -109,7 +112,7 @@ export const updateImage = async (req: Request, res: Response) => {
       });
     }
 
-    removeFromCache('images');
+    removeFromCache("images");
 
     return res.status(200).send(updatedImage);
   } catch (err: any) {
@@ -130,9 +133,8 @@ export const deleteImage = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    
     await removeImage(parseInt(id));
-    removeFromCache('images');
+    removeFromCache("images");
 
     res.sendStatus(204);
   } catch (err: any) {
