@@ -114,11 +114,11 @@ export const updateImage = async (req: Request, res: Response) => {
 
     removeFromCache("images");
 
-    return res.status(200).send(updatedImage);
+    return res.status(201).send(updatedImage);
   } catch (err: any) {
     if (err.meta.target.includes("url")) {
       return res.status(400).send({
-        message: "URL already in use",
+        message: "Image path already in use",
       });
     }
     return res.status(500).send({
