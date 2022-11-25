@@ -129,7 +129,7 @@ export const updateCaption = async (req: Request, res: Response) => {
 
     removeFromCache("images");
 
-    return res.status(200).send(updatedCaption);
+    return res.status(201).send(updatedCaption);
   } catch (err: any) {
     return res.status(500).send({
       message: err.message,

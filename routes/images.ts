@@ -67,6 +67,8 @@ imageRouter.get("/:id", getImage);
  *      - application/json
  *    tags:
  *      - Images
+ *    security:
+ *      - bearerAuth: []
  *    requestBody:
  *      description: Data for new image
  *      required: true
@@ -79,6 +81,10 @@ imageRouter.get("/:id", getImage);
  *        descriptions: returns created image
  *        schema:
  *          $ref: '#components/schemas/Image
+ *      "401":
+ *        description: User is not authenticated
+ *      "403":
+ *        description: User is not authorized to create an image
  */
 imageRouter.post("/", isAuthenticated, isAdmin, addImage);
 
@@ -91,6 +97,7 @@ imageRouter.post("/", isAuthenticated, isAdmin, addImage);
  *      - application/json
  *    tags:
  *      - Images
+ *    security: bearerAuth: []
  *    parameters:
  *      - name: id
  *        description: ID of the image to update
@@ -122,6 +129,10 @@ imageRouter.post("/", isAuthenticated, isAdmin, addImage);
  *        description: Image path is missing
  *      "400":
  *        description: Image path is already in use
+ *      "401":
+ *        description: User is not authenticated
+ *      "403":
+ *        description: User is not authorized to update the image
  *      "404":
  *        description: Image not found
  */
@@ -136,9 +147,11 @@ imageRouter.put("/:id", isAuthenticated, isAdmin, updateImage);
  *        - application/json
  *      tags:
  *        - Images
+ *      security:
+ *        - bearerAuth: []
  *      parameters:
  *        - name: id
- *          description: ID of the image to update
+ *          description: ID of the image to delete
  *          in: path
  *          type: integer
  *          required: true
@@ -146,6 +159,10 @@ imageRouter.put("/:id", isAuthenticated, isAdmin, updateImage);
  *      responses:
  *        "204":
  *          description: Image deleted
+ *        "401":
+ *          description: User is not authenticated
+ *        "403":
+ *          description: User is not authorized to delete the image
  *        "404":
  *          description: Image not found
  */

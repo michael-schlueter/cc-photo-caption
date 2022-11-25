@@ -26,4 +26,14 @@ router.get("/", swaggerUi.setup(specs, {
     explorer: true,
 }));
 
+/**
+ * @swagger
+ * components:
+ *  securitySchemes:
+ *      bearerAuth:
+ *          type: http
+ *          scheme: bearer
+ *          bearerFormat: JWT
+ */
+
 module.exports = router;
