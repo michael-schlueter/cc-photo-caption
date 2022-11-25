@@ -84,7 +84,7 @@ userRouter.get("/:id", getUser);
  *            $ref: '#/components/schemas/User'
  *        "400":
  *          description: Email already in use
- *        "400": 
+ *        "400":
  *          description: No valid email address
  *        "400":
  *          description: No valid password
