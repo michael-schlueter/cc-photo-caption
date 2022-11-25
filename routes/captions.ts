@@ -133,7 +133,7 @@ captionRouter.post("/", isAuthenticated, addCaption);
  *      "404":
  *        description: Caption not found
  */
-captionRouter.put("/:id", isAuthenticated, isAdmin, updateCaption);
+captionRouter.put("/:id", isAuthenticated, updateCaption);
 
 /**
  * @swagger
@@ -163,6 +163,6 @@ captionRouter.put("/:id", isAuthenticated, isAdmin, updateCaption);
  *        "404":
  *          description: Caption not found
  */
-captionRouter.delete("/:id", isAuthenticated, isAdmin, deleteCaption);
+captionRouter.delete("/:id", isAuthenticated, deleteCaption);
 
 module.exports = captionRouter;
