@@ -13,145 +13,157 @@ const imageRouter = express.Router();
 
 /**
  * @swagger
+ * components:
+ *  schemas:
+ *      Image:
+ *          type: object
+ *          required:
+ *              - url
+ *          properties:
+ *              url:
+ *                  type: string
+ *                  description: URL path to image file
+ *              name:
+ *                  type: string
+ *                  description: Name for the image
+ *          example:
+ *              path: /images/sample.jpg
+ *              name: Sample Image
+ *  securitySchemes:
+ *      bearerAuth:
+ *          type: http
+ *          scheme: bearer
+ *          bearerFormat: JWT
+ */
+
+/**
+ * @swagger
  * /images:
- *  get:
- *    summary: Get all photos
- *    produces:
- *      - application/json
- *    tags:
- *      - Images
- *    responses:
- *      "200":
- *        description: returns a list of all photos
- *        schema:
- *          type: array
- *          items:
- *            $ref: '#/components/schemas/Image'
- *      "404":
- *        description: no images found
+ *    get:
+ *      summary: Get all images
+ *      produces:
+ *        - application/json
+ *      tags:
+ *        - Images
+ *      responses:
+ *        "200":
+ *          description: Returns a list of all images
+ *          schema:
+ *            type: array
+ *            items:
+ *              $ref: '#/components/schemas/Image'
+ *        "404":
+ *          description: No images found
  */
 imageRouter.get("/", getAllImages);
 
 /**
  * @swagger
  * /images/{id}:
- *  get:
- *    summary: Get a specific photo with captions
- *    produces:
- *      - application/json
- *    tags:
- *      - Images
- *    parameters:
- *      - name: id
- *        description: image id
- *        in: path
- *        type: integer
- *        required: true
- *        example: 1
- *    responses:
- *      "200":
- *        description: returns a photo with its captions
- *      schema:
- *        $ref: '#/components/schemas/Image'
- *      "404":
- *        description: Image not found
+ *    get:
+ *      summary: Get a specific image with its corresponding captions
+ *      produces:
+ *        - application/json
+ *      tags:
+ *        - Images
+ *      parameters:
+ *        - name: id
+ *          description: Image id
+ *          in: path
+ *          type: integer
+ *          required: true
+ *          example: 1
+ *      responses:
+ *        "200":
+ *          description: Returns a single image with its captions
+ *          schema:
+ *            $ref: '#/components/schemas/Image'
+ *        "404":
+ *          description: Image not found
  */
 imageRouter.get("/:id", getImage);
 
 /**
  * @swagger
  * /images:
- *  post:
- *    summary: Creates a new image
- *    produces:
- *      - application/json
- *    tags:
- *      - Images
- *    security:
- *      - bearerAuth: []
- *    requestBody:
- *      description: Data for new image
- *      required: true
- *      content:
- *        application/json:
+ *    post:
+ *      summary: Creates a new image
+ *      produces:
+ *        - application/json
+ *      tags:
+ *        - Images
+ *      requestBody:
+ *        description: Data for new image
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Image'
+ *      responses:
+ *        "201":
+ *          description: Returns created image
  *          schema:
- *            $ref: '#components/schemas/Image
- *    responses:
- *      "201":
- *        descriptions: returns created image
- *        schema:
- *          $ref: '#components/schemas/Image
- *      "401":
- *        description: User is not authenticated
- *      "403":
- *        description: User is not authorized to create an image
+ *            $ref: '#/components/schemas/Image'
+ *        "400":
+ *          description: URL path is missing / URL path already exists
+ *        "401":
+ *          description: User not authenticated
+ *        "403":
+ *          description: User not authorized to create images (needs admin rights)
  */
 imageRouter.post("/", isAuthenticated, isAdmin, addImage);
 
 /**
  * @swagger
  * /images/{id}:
- *  put:
- *    summary: Updates the data of a specific image
- *    produces:
- *      - application/json
- *    tags:
- *      - Images
- *    security: bearerAuth: []
- *    parameters:
- *      - name: id
- *        description: ID of the image to update
- *        in: path
- *        type: integer
+ *    put:
+ *      summary: Updates the data of an image
+ *      produces:
+ *        - application/json
+ *      tags:
+ *        - Images
+ *      parameters:
+ *        - name: id
+ *          description: ID of the image to update
+ *          in: path
+ *          type: integer
+ *          required: true
+ *          example: 1
+ *      requestBody:
+ *        description: Updated image data
  *        required: true
- *        example: 1
- *    requestBody:
- *      description: Data to update the image
- *      required: true
- *      content:
- *        application/json:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Image'
+ *      responses:
+ *        "201":
+ *          description: Returns updated image
  *          schema:
- *            type: object
- *            properties:
- *              name:
- *                type: string
- *                example: A dog
- *              url:
- *                type: string
- *                description: path to image
- *                example: /images/puppy.jpg
- *    responses:
- *      "201":
- *        description: returns updated image
- *        schema:
- *          $ref: '#components/schemas/Image
- *      "400":
- *        description: Image path is missing
- *      "400":
- *        description: Image path is already in use
- *      "401":
- *        description: User is not authenticated
- *      "403":
- *        description: User is not authorized to update the image
- *      "404":
- *        description: Image not found
+ *            $ref: '#/components/schemas/Image'
+ *        "400":
+ *          description: URL path is missing / URL path already exists
+ *        "401":
+ *          description: User not authenticated
+ *        "403":
+ *          description: User not authorized to update this image
+ *        "404":
+ *          description: Image not found
  */
 imageRouter.put("/:id", isAuthenticated, isAdmin, updateImage);
 
 /**
  * @swagger
- *  /images/{id}:
+ * /images/{id}:
  *    delete:
- *      summary: Deletes a specific image
+ *      summary: Deletes an image
  *      produces:
  *        - application/json
  *      tags:
  *        - Images
- *      security:
- *        - bearerAuth: []
  *      parameters:
  *        - name: id
- *          description: ID of the image to delete
+ *          description: Image id
  *          in: path
  *          type: integer
  *          required: true
@@ -160,9 +172,9 @@ imageRouter.put("/:id", isAuthenticated, isAdmin, updateImage);
  *        "204":
  *          description: Image deleted
  *        "401":
- *          description: User is not authenticated
+ *          description: User not authenticated
  *        "403":
- *          description: User is not authorized to delete the image
+ *          description: User not authorized to delete this image
  *        "404":
  *          description: Image not found
  */
