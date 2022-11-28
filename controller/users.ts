@@ -215,11 +215,6 @@ export const updateUser = async (req: Request, res: Response) => {
 
     return res.status(200).send(updatedUser);
   } catch (err: any) {
-    // if (err.meta.target.includes("email")) {
-    //   return res.status(400).send({
-    //     message: "Email already in use",
-    //   });
-    // }
     return res.status(500).send({
       message: err.message,
     });

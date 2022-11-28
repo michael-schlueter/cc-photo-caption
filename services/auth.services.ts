@@ -1,11 +1,17 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, RefreshToken } from "@prisma/client";
 import { hashToken } from "../utils/hashToken";
 
 const prisma = new PrismaClient();
 
+interface ICreateRefreshTokenArgs {
+  jti: string,
+  refreshToken: string,
+  userId: number
+}
+
 // Used when creating a new token
 // @ts-ignore
-export const addRefreshTokenToWhitelist = ({ jti, refreshToken, userId }) => {
+export const addRefreshTokenToWhitelist = ({ jti, refreshToken, userId }: ICreateRefreshTokenArgs) => {
   return prisma.refreshToken.create({
     data: {
       id: jti,
