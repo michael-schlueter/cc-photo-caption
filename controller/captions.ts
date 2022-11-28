@@ -8,6 +8,7 @@ import {
   findCaptions,
   removeCaption,
 } from "../services/captions.services";
+import { findImageById } from "../services/images.services";
 import { findUserById } from "../services/users.services";
 
 const prisma = new PrismaClient();
@@ -54,7 +55,7 @@ export const getCaption = async (req: Request, res: Response) => {
   }
 };
 
-// @desc    Create an caption
+// @desc    Create a caption
 // @route   POST /api/captions/
 export const addCaption = async (req: Request, res: Response) => {
   const { description, imageId } = req.body;
@@ -73,6 +74,12 @@ export const addCaption = async (req: Request, res: Response) => {
       });
     }
 
+    if (await findImageById(parseInt(imageId)) == null) {
+      return res.status(400).send({
+        message: "Image does not exist"
+      })
+    }
+
     const newCaption = await createCaption(
       description,
       parseInt(imageId),
@@ -83,11 +90,6 @@ export const addCaption = async (req: Request, res: Response) => {
 
     return res.status(201).send(newCaption);
   } catch (err: any) {
-    if (err.code === "P2003") {
-      return res.status(400).send({
-        message: "Image id does not exist",
-      });
-    }
     return res.status(500).send({
       message: err.message,
     });
