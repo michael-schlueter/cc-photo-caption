@@ -1,3 +1,4 @@
+import { Image } from "@prisma/client";
 import { Request, Response } from "express";
 import {
   addToCache,
@@ -45,7 +46,15 @@ export const getImage = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const image = await findImageByIdWithCaptions(parseInt(id));
+
+    // Retrieve image from cache, if it isn't cached, retrieve it from database
+    let image: Image | undefined | null = retrieveFromCache("images")?.find(img => {
+      return img.id === parseInt(id)
+    })
+
+    if (!image) {
+      image = await findImageByIdWithCaptions(parseInt(id));
+    }
 
     if (!image) {
       return res.status(404).send({
