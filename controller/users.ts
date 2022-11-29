@@ -303,20 +303,18 @@ export const validateRefreshToken = async (req: Request, res: Response) => {
   }
 };
 
-// This endpoint is only for demo purpose.
-// Move this logic where you need to revoke the tokens (e.g. password reset)
 // @desc    Revoke refresh token for a specific user
 // @route   POST /api/users/id
-export const revokeRefreshTokens = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.body;
-    await revokeTokens(userId);
-    res
-      .status(201)
-      .send({ message: `Tokens revoked for user with id #${userId}` });
-  } catch (err: any) {
-    res.status(500).send({
-      message: err.message,
-    });
-  }
-};
+// export const revokeRefreshTokens = async (req: Request, res: Response) => {
+//   try {
+//     const { userId } = req.body;
+//     await revokeTokens(userId);
+//     res
+//       .status(201)
+//       .send({ message: `Tokens revoked for user with id #${userId}` });
+//   } catch (err: any) {
+//     res.status(500).send({
+//       message: err.message,
+//     });
+//   }
+// };

@@ -17,6 +17,7 @@ import {
 // @route   GET /api/images
 export const getAllImages = async (req: Request, res: Response) => {
   try {
+    // Retrieve images from cache or from database if they are not yet cached
     let images = retrieveFromCache("images");
 
     if (!images) {

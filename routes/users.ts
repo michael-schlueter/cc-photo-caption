@@ -9,7 +9,6 @@ import {
   updateUser,
   loginUser,
   validateRefreshToken,
-  revokeRefreshTokens,
 } from "../controller/users";
 
 const userRouter = express.Router();
@@ -201,7 +200,8 @@ userRouter.post("/login", loginUser);
  *          description: Not authorized to obtain refresh token
  */
 userRouter.post("/refreshToken", isAuthenticated, validateRefreshToken);
-userRouter.post(":id", isAuthenticated, revokeRefreshTokens);
+
+// userRouter.post(":id", isAuthenticated, revokeRefreshTokens);
 
 /**
  * @swagger
