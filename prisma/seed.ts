@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+const bcrypt = require("bcrypt");
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -7,7 +9,7 @@ async function main() {
     update: {},
     create: {
       email: "alice@email.com",
-      password: "P4$sword",
+      password: bcrypt.hashSync("P4$sword", 12),
       isAdmin: true
     },
   });
@@ -16,7 +18,7 @@ async function main() {
     update: {},
     create: {
       email: "bob@email.com",
-      password: "P4$sword",
+      password: bcrypt.hashSync("P4$sword", 12),
     },
   });
   const caroline = await prisma.user.upsert({
@@ -24,7 +26,7 @@ async function main() {
     update: {},
     create: {
       email: "caroline@email.com",
-      password: "P4$sword",
+      password: bcrypt.hashSync("P4$sword", 12),
     },
   });
   const cubs = await prisma.image.upsert({
