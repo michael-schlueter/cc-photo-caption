@@ -27,7 +27,7 @@ const imageRouter = express.Router();
  *                  type: string
  *                  description: Name for the image
  *          example:
- *              path: /images/sample.jpg
+ *              url: /images/sample.jpg
  *              name: Sample Image
  *  securitySchemes:
  *      bearerAuth:
@@ -38,7 +38,7 @@ const imageRouter = express.Router();
 
 /**
  * @swagger
- * /images:
+ * /api/images:
  *    get:
  *      summary: Get all images
  *      produces:
@@ -59,7 +59,7 @@ imageRouter.get("/", getAllImages);
 
 /**
  * @swagger
- * /images/{id}:
+ * /api/images/{id}:
  *    get:
  *      summary: Get a specific image with its corresponding captions
  *      produces:
@@ -85,13 +85,15 @@ imageRouter.get("/:id", getImage);
 
 /**
  * @swagger
- * /images:
+ * /api/images:
  *    post:
  *      summary: Creates a new image
  *      produces:
  *        - application/json
  *      tags:
  *        - Images
+ *      security:
+ *        - bearerAuth: []
  *      requestBody:
  *        description: Data for new image
  *        required: true
@@ -115,13 +117,15 @@ imageRouter.post("/", isAuthenticated, isAdmin, addImage);
 
 /**
  * @swagger
- * /images/{id}:
+ * /api/images/{id}:
  *    put:
  *      summary: Updates the data of an image
  *      produces:
  *        - application/json
  *      tags:
  *        - Images
+ *      security:
+ *        - bearerAuth: []
  *      parameters:
  *        - name: id
  *          description: ID of the image to update
@@ -154,20 +158,22 @@ imageRouter.put("/:id", isAuthenticated, isAdmin, updateImage);
 
 /**
  * @swagger
- * /images/{id}:
+ * /api/images/{id}:
  *    delete:
  *      summary: Deletes an image
  *      produces:
  *        - application/json
  *      tags:
  *        - Images
+ *      security:
+ *        - bearerAuth: []
  *      parameters:
  *        - name: id
  *          description: Image id
  *          in: path
  *          type: integer
  *          required: true
- *          example: 1
+ *          example: 3
  *      responses:
  *        "204":
  *          description: Image deleted

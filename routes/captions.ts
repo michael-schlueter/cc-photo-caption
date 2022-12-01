@@ -44,7 +44,7 @@ const captionRouter = express.Router();
 
 /**
  * @swagger
- * /captions:
+ * /api/captions:
  *    get:
  *      summary: Get all captions
  *      produces:
@@ -65,7 +65,7 @@ captionRouter.get("/", getAllCaptions);
 
 /**
  * @swagger
- * /captions/{id}:
+ * /api/captions/{id}:
  *    get:
  *      summary: Get a specific caption
  *      produces:
@@ -91,7 +91,7 @@ captionRouter.get("/:id", getCaption);
 
 /**
  * @swagger
- * /captions:
+ * /api/captions:
  *    post:
  *      summary: Creates a new caption
  *      produces:
@@ -121,7 +121,7 @@ captionRouter.post("/", isAuthenticated, addCaption);
 
 /**
  * @swagger
- * /captions/{id}:
+ * /api/captions/{id}:
  *    put:
  *      summary: Updates the description of a caption
  *      produces:
@@ -166,7 +166,7 @@ captionRouter.put("/:id", isAuthenticated, updateCaption);
 
 /**
  * @swagger
- * /captions/{id}:
+ * /api/captions/{id}:
  *    delete:
  *      summary: Deletes a caption
  *      produces:
@@ -181,7 +181,7 @@ captionRouter.put("/:id", isAuthenticated, updateCaption);
  *          in: path
  *          type: integer
  *          required: true
- *          example: 1
+ *          example: 3
  *      responses:
  *        "204":
  *          description: Caption deleted

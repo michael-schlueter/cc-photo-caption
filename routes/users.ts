@@ -46,7 +46,7 @@ const userRouter = express.Router();
 
 /**
  * @swagger
- * /users:
+ * /api/users:
  *    get:
  *      summary: Get all users
  *      produces:
@@ -67,7 +67,7 @@ userRouter.get("/", getAllUsers);
 
 /**
  * @swagger
- * /users/{id}:
+ * /api/users/{id}:
  *    get:
  *      summary: Get a specific user
  *      produces:
@@ -93,7 +93,7 @@ userRouter.get("/:id", getUser);
 
 /**
  * @swagger
- * /users:
+ * /api/users:
  *    post:
  *      summary: Creates a new user
  *      produces:
@@ -119,7 +119,7 @@ userRouter.post("/", registerUser);
 
 /**
  * @swagger
- * /users/login:
+ * /api/users/login:
  *    post:
  *      summary: Login to get user's access token and refresh token
  *      produces:
@@ -136,7 +136,7 @@ userRouter.post("/", registerUser);
  *              properties:
  *                email:
  *                  type: string
- *                  example: testuser@test.com
+ *                  example: alice@email.com
  *                password:
  *                  type: string
  *                  example: P4$sword
@@ -161,7 +161,7 @@ userRouter.post("/login", loginUser);
 
 /**
  * @swagger
- * /users/refreshToken:
+ * /api/users/refreshToken:
  *    post:
  *      summary: Generate and obtain a new refresh token
  *      produces:
@@ -205,7 +205,7 @@ userRouter.post("/refreshToken", isAuthenticated, validateRefreshToken);
 
 /**
  * @swagger
- * /users/{id}:
+ * /api/users/{id}:
  *    put:
  *      summary: Updates the email or password of a user
  *      produces:
@@ -220,7 +220,7 @@ userRouter.post("/refreshToken", isAuthenticated, validateRefreshToken);
  *          in: path
  *          type: integer
  *          required: true
- *          example: 1
+ *          example: 2
  *      requestBody:
  *        description: Updated user data
  *        required: true
@@ -231,10 +231,10 @@ userRouter.post("/refreshToken", isAuthenticated, validateRefreshToken);
  *              properties:
  *                email:
  *                  type: string
- *                  example: testuser@test.com
+ *                  example: clark@test.com
  *                password:
  *                  type: string
- *                  example: P4Ssword
+ *                  example: P4$sword
  *      responses:
  *        "200":
  *          description: Returns updated user
@@ -253,20 +253,22 @@ userRouter.put("/:id", isAuthenticated, updateUser);
 
 /**
  * @swagger
- * /users/{id}:
+ * /api/users/{id}:
  *    delete:
  *      summary: Deletes a user
  *      produces:
  *        - application/json
  *      tags:
  *        - Users
+ *      security:
+ *        - bearerAuth: []
  *      parameters:
  *        - name: id
  *          description: User id
  *          in: path
  *          type: integer
  *          required: true
- *          example: 1
+ *          example: 3
  *      responses:
  *        "204":
  *          description: User deleted
