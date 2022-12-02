@@ -227,22 +227,22 @@ export const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    // const userToDelete = await findUserById(parseInt(id));
+    const userToDelete = await findUserById(parseInt(id));
 
-    // if (!userToDelete) {
-    //   return res.status(404).send({
-    //     message: "User not found",
-    //   });
-    // }
+    if (!userToDelete) {
+      return res.status(404).send({
+        message: "User not found",
+      });
+    }
 
-    // // User who deletes
-    // const user = await findUserById(req.payload!.userId);
+    // User who deletes
+    const user = await findUserById(req.payload!.userId);
 
-    // if (req.payload?.userId !== userToDelete.id && user?.isAdmin === false) {
-    //   return res.status(403).send({
-    //     message: "Not authorized to delete user",
-    //   });
-    // }
+    if (req.payload?.userId !== userToDelete.id && user?.isAdmin === false) {
+      return res.status(403).send({
+        message: "Not authorized to delete user",
+      });
+    }
 
     await removeUser(parseInt(id));
 

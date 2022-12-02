@@ -8,6 +8,7 @@ import {
 import {
   createImage,
   editImage,
+  findImageById,
   findImageByIdWithCaptions,
   findImageByUrl,
   findImages,
@@ -146,16 +147,20 @@ export const deleteImage = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
+    const imageToDelete = await findImageById(parseInt(id));
+    console.log(imageToDelete);
+
+    if (!imageToDelete) {
+      return res.status(404).send({
+        message: "Image to delete does not exist"
+      })
+    }
+
     await removeImage(parseInt(id));
     removeFromCache("images");
 
     res.sendStatus(204);
   } catch (err: any) {
-    if (err.code === "P2025") {
-      return res.status(404).send({
-        message: "Image to delete does not exist",
-      });
-    }
     return res.status(500).send({
       message: err.message,
     });
