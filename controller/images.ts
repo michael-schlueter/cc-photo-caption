@@ -117,7 +117,8 @@ export const updateImage = async (req: Request, res: Response) => {
 
     const existingImage = await findImageByUrl(url);
 
-    if (existingImage) {
+    // Only show message if the URL path exists for another image other than this one
+    if (existingImage && existingImage.id !== parseInt(id)) {
       return res.status(400).send({
         message: "Image URL already exists",
       });
