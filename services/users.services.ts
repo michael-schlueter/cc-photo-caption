@@ -64,7 +64,7 @@ export const editUser = (id: number, email: string, password: string) => {
 };
 
 export const removeUser = (id: number) => {
-  prisma.user.delete({
+  return prisma.user.delete({
     where: {
       id,
     },

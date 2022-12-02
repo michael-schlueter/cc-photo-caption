@@ -163,7 +163,7 @@ export const deleteCaption = async (req: Request, res: Response) => {
       });
     }
 
-    removeCaption(parseInt(id));
+    await removeCaption(parseInt(id));
     removeFromCache("images");
 
     res.sendStatus(204);
