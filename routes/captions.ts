@@ -106,7 +106,17 @@ captionRouter.get("/:id", getCaption);
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Caption'
+ *              type: object
+ *              properties:
+ *                imageId:
+ *                  type: integer
+ *                  description: Refers to the image this caption is made for (FK)
+ *                description:
+ *                  type: string
+ *                  description: Caption for this image
+ *              example:
+ *                imageId: 1
+ *                description: This is a beautiful cub
  *      responses:
  *        "201":
  *          description: Returns created caption

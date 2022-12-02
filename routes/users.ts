@@ -106,7 +106,14 @@ userRouter.get("/:id", getUser);
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/User'
+ *              type: object
+ *              properties:
+ *                email:
+ *                  type: string
+ *                  example: dauphne@email.com
+ *                password:
+ *                  type: string
+ *                  example: P4$sword
  *      responses:
  *        "201":
  *          description: Returns created user
