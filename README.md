@@ -56,7 +56,11 @@ JWT_REFRESH_SECRET=ANOTHER_SECRET123
 ```
 npx prisma migrate reset
 ```
-5. Go to localhost:5000/api-docs to get to the API documentation. There you can test the API endpoints.
+5. Run the command in your terminal to start the server.
+```
+npm run start
+```
+6. Go to localhost:5000/api-docs to get to the API documentation. There you can test the API endpoints.
 
 
 
