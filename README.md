@@ -65,10 +65,11 @@ in your terminal to seed the database with some data.
 - Building an application with Vite
 - Designing an API from scratch
 - Building an Node/Express application in TypeScript for type-safety (e.g., implementing types for request / response objects)
-- Setting up Prisma (Model, Migration)
-- Writing database queries using Prisma
+- Setting up Prisma (Model, Migration, Seeding)
+- Writing database queries using Prisma (Concept of Cascading)
 - Error-Handling with Prisma / Typescript
 - Setting up and using Swagger to create an API documentation
+- Segregate the project into small and simple tasks to better manage the scope of it
 
 
 
