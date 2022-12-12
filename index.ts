@@ -22,6 +22,10 @@ app.use("/api/users", userRouter);
 app.use("/api/images", imageRouter);
 app.use("/api/captions", captionRouter);
 
+app.use("/", (req, res) => {
+  res.status(404).send('Route Not Found: Please use the /api-docs endpoint')
+})
+
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
