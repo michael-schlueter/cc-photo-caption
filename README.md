@@ -38,7 +38,7 @@
 
 
 ## Setup
-The dependencies which are necessary to run this app can be found in the package.json file. Node needs to be installed on your system. You also need a running PostgreSQL instance.
+The dependencies which are necessary to run this app can be found in the package.json file. Node needs to be installed on your system. You also need a running PostgreSQL database instance.
 
 1. Clone the repo.
 2. Navigate to the project folder in the terminal and install the necessary NPM dependencies.
@@ -52,11 +52,10 @@ PORT=5000
 JWT_ACCESS_SECRET=SECRET123
 JWT_REFRESH_SECRET=ANOTHER_SECRET123
 ```
-4. Run the command
+4. Run the command in your terminal to seed the database with some data.
 ```
-npx prisma db seed
+npx prisma migrate reset
 ```
-in your terminal to seed the database with some data.
 5. Go to localhost:5000/api-docs to get to the API documentation. There you can test the API endpoints.
 
 
