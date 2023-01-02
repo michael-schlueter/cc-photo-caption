@@ -18,7 +18,7 @@ import {
 } from "../services/users.services";
 import { generateTokens } from "../utils/jwt";
 import { hashToken } from "../utils/hashToken";
-import { findImageByIdWithCaptions } from "../services/images.services";
+import { findUserById } from "../services/users.services";
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -51,7 +51,7 @@ export const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const user = await findImageByIdWithCaptions(parseInt(id));
+    const user = await findUserById(parseInt(id));
 
     if (!user) {
       return res.status(404).send({
