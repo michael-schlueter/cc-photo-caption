@@ -10,7 +10,6 @@ interface ICreateRefreshTokenArgs {
 }
 
 // Used when creating a new token
-// @ts-ignore
 export const addRefreshTokenToWhitelist = ({ jti, refreshToken, userId }: ICreateRefreshTokenArgs) => {
   return prisma.refreshToken.create({
     data: {
