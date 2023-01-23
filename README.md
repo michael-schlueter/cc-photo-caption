@@ -78,6 +78,7 @@ npm run start
 - Error-Handling with Prisma / Typescript
 - Setting up and using Swagger to create an API documentation
 - Segregate the project into small and simple tasks to better manage the scope of it
+- Deciding which API endpoints to create / expose and which not (used way too many for this project)
 
 
 
