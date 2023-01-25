@@ -190,6 +190,12 @@ export const updateUser = async (req: Request, res: Response) => {
 
     const user = await findUserById(req.payload!.userId);
     const userToUpdate = await findUserById(parseInt(id));
+    
+        if (!userToUpdate) {
+      return res.status(404).send({
+        message: "User not found",
+      });
+    }
 
     if (req.payload?.userId !== userToUpdate?.id && user?.isAdmin === false) {
       return res.status(403).send({
@@ -206,12 +212,6 @@ export const updateUser = async (req: Request, res: Response) => {
     }
 
     const updatedUser = await editUser(parseInt(id), email, password);
-
-    if (!updatedUser) {
-      return res.status(404).send({
-        message: "User not found",
-      });
-    }
 
     return res.status(200).send(updatedUser);
   } catch (err: any) {
